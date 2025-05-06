@@ -151,7 +151,12 @@ def get_orders():
     import yaml
     config_path = [path["path"] for path in HydraConfig.get().runtime.config_sources if path["schema"] == "file"][0]
     
-    with open(f'{config_path}/experiment/{HydraConfig.get().runtime.choices.experiment}.yaml', 'r') as file:
+    file_param = HydraConfig.get().runtime.choices.experiment
+
+    if file_param.endswith(".yaml"):
+        raise FileNotFoundError(f"Error: the input file '{file_param}' should not be typed with its extension.")
+
+    with open(f'{config_path}/experiment/{file_param}.yaml', 'r') as file:
         original_experiment_config = yaml.safe_load(file)
     
     defaults = original_experiment_config['defaults']

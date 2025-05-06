@@ -71,7 +71,10 @@ def run(cfg, state):
         state.ax.set_title("YEAR : " + str(getattr(state, 't', tf.constant(0)).numpy()), size=15)
 
         if not hasattr(state, "already_set_cbar"):
-            state.cbar = plt.colorbar(im, label=cfg.outputs.plot2d.var)
+            var_info = state.var_info_ncdf_ex
+            var      = cfg.outputs.plot2d.var
+            labelname = f"{var_info[var][0]} ({var_info[var][1]})"
+            state.cbar = plt.colorbar(im, label=labelname)#cfg.outputs.plot2d.var)
             state.already_set_cbar = True
 
         if cfg.outputs.plot2d.live:

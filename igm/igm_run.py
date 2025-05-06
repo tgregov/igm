@@ -52,9 +52,9 @@ def main(cfg: DictConfig) -> None:
 
     gpus = tf.config.list_physical_devices("GPU")
 
-    print([gpus[i] for i in cfg.core.hardware.visible_gpus])
     if gpus:
         try:
+            print([gpus[i] for i in cfg.core.hardware.visible_gpus])
             selected_visible_gpus = [gpus[i] for i in cfg.core.hardware.visible_gpus]
             tf.config.set_visible_devices(selected_visible_gpus, "GPU")
             logical_gpus = tf.config.list_logical_devices("GPU")
