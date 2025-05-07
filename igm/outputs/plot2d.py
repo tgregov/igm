@@ -68,7 +68,7 @@ def run(cfg, state):
                     s=0.5,
                     cmap="RdBu",
                 )
-        state.ax.set_title("YEAR : " + str(getattr(state, 't', tf.constant(0)).numpy()), size=15)
+        state.ax.set_title("Time: " + str(getattr(state, 't', tf.constant(0)).numpy()) + " (yr)", size=12)
 
         if not hasattr(state, "already_set_cbar"):
             var_info = state.var_info_ncdf_ex
