@@ -14,9 +14,9 @@
    - to update the ice flow and its emulator in update_iceflow
 
 In update_iceflow, we compute/update with function _update_iceflow_emulated,
-and retraine the iceflow emaultor in function _update_iceflow_emulator
+and retrain the iceflow emulator in function _update_iceflow_emulator
 
-- in _update_iceflow_emulated, we baiscially gather together all input fields
+- in _update_iceflow_emulated, we basically gather together all input fields
 of the emulator and stack all in a single tensor X, then we compute the output
 with Y = iceflow_model(X), and finally we split Y into U and V
 
@@ -31,15 +31,15 @@ retrain the emulator on large size arrays.
 
 Alternatively, one can solve the Blatter-Pattyn model using a solver using 
 function _update_iceflow_solved. Doing so is not very different to retrain the
-emulator as we minmize the same energy, however, with different controls,
+emulator as we minimize the same energy, however, with different controls,
 namely directly the velocity field U and V instead of the emulator parameters.
 """
 
-from .emulate.emulate import initialize_iceflow_emulator,update_iceflow_emulated
-from .emulate.emulate import update_iceflow_emulator, save_iceflow_model
-from .solve.solve import initialize_iceflow_solver, update_iceflow_solved
+from .emulate.emulate       import initialize_iceflow_emulator,update_iceflow_emulated
+from .emulate.emulate       import update_iceflow_emulator, save_iceflow_model
+from .solve.solve           import initialize_iceflow_solver, update_iceflow_solved
 from .diagnostic.diagnostic import initialize_iceflow_diagnostic, update_iceflow_diagnostic
-from .utils import initialize_iceflow_fields, define_vertical_weight,compute_PAD
+from .utils                 import initialize_iceflow_fields, define_vertical_weight,compute_PAD
 
 def initialize(cfg, state):
 
@@ -47,32 +47,36 @@ def initialize(cfg, state):
     if hasattr(state, "was_initialize_iceflow_already_called"):
         return
 
-    # deinfe the fields of the ice flow such a U, V, but also sliding coefficient, arrhenius, ectt
+    # Define the fields of the ice flow such a U, V, but also sliding coefficient, arrhenius, etc
     initialize_iceflow_fields(cfg, state)
 
-    if cfg.processes.iceflow.method == "emulated":
-        # define the emulator, and the optimizer
-        initialize_iceflow_emulator(cfg, state)
-    elif cfg.processes.iceflow.method == "solved":
-        # define the solver, and the optimizer
-        initialize_iceflow_solver(cfg, state)    
-    elif cfg.processes.iceflow.method == "diagnostic":
-        # define the second velocity field
-        initialize_iceflow_diagnostic(cfg,state)
+    match cfg.processes.iceflow.method:
+        case "emulated":
+            # define the emulator, and the optimizer
+            initialize_ice_flow = initialize_iceflow_emulator
+        case "solved":
+            # define the solver, and the optimizer
+            initialize_ice_flow = initialize_iceflow_solver
+        case "diagnostic":
+            # define the second velocity field
+            initialize_ice_flow = initialize_iceflow_diagnostic
 
-    # create the vertica discretization
+    initialize_ice_flow(cfg,state)
+
+    # create the vertical discretization
     define_vertical_weight(cfg, state)
     
-    # padding is necessary when using U-net emulator
+    # Padding is necessary when using U-net emulator
     state.PAD = compute_PAD(cfg, state.thk.shape[1],state.thk.shape[0])
     
     if not cfg.processes.iceflow.method == "solved":
         update_iceflow_emulator(cfg, state, 0)
         update_iceflow_emulated(cfg, state)
          
-    # Currently it is not supported to have the two working simulatanoutly
-    assert (cfg.processes.iceflow.emulator.exclude_borders==0) | (cfg.processes.iceflow.emulator.network.multiple_window_size==0)
- 
+    # Currently it is not supported to have the two working simultaneously
+    assert (cfg.processes.iceflow.emulator.exclude_borders==0) \
+         | (cfg.processes.iceflow.emulator.network.multiple_window_size==0)
+
     # This makes sure this function is only called once
     state.was_initialize_iceflow_already_called = True
 
@@ -83,15 +87,17 @@ def update(cfg, state):
 
     if cfg.processes.iceflow.method == "emulated":
         if (cfg.processes.iceflow.emulator.retrain_freq > 0) & (state.it > 0):
-            update_iceflow_emulator(cfg, state, state.it)
+                update_iceflow_emulator(cfg, state, state.it)
 
-        update_iceflow_emulated(cfg, state)
+    match cfg.processes.iceflow.method:
+        case "emulated":
+            update_iceflow = update_iceflow_emulated
+        case "solved":
+            update_iceflow = update_iceflow_solved
+        case "diagnostic":
+            update_iceflow = update_iceflow_diagnostic
 
-    elif cfg.processes.iceflow.method == "solved":
-        update_iceflow_solved(cfg, state)
-
-    elif cfg.processes.iceflow.method == "diagnostic":
-        update_iceflow_diagnostic(cfg, state)
+    update_iceflow(cfg, state)
 
 def finalize(cfg, state):
 

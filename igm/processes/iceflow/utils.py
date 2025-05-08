@@ -43,12 +43,13 @@ def define_vertical_weight(cfg, state):
 
 
 def update_2d_iceflow_variables(cfg, state):
-    state.uvelbase = state.U[0, :, :]
-    state.vvelbase = state.V[0, :, :]
-    state.ubar = tf.reduce_sum(state.U * state.vert_weight, axis=0)
-    state.vbar = tf.reduce_sum(state.V * state.vert_weight, axis=0)
+    state.uvelbase = state.U[0,  :, :]
+    state.vvelbase = state.V[0,  :, :]
     state.uvelsurf = state.U[-1, :, :]
     state.vvelsurf = state.V[-1, :, :]
+    state.ubar = tf.reduce_sum(state.U * state.vert_weight, axis=0)
+    state.vbar = tf.reduce_sum(state.V * state.vert_weight, axis=0)
+
 
 def compute_PAD(cfg,Nx,Ny):
 

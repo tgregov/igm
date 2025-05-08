@@ -108,7 +108,6 @@ def update_iceflow_emulated(cfg, state):
     # Define the input of the NN, include scaling
 
     Ny, Nx = state.thk.shape
-    N = cfg.processes.iceflow.numerics.Nz
 
     fieldin = [vars(state)[f] for f in cfg.processes.iceflow.emulator.fieldin]
 
@@ -134,7 +133,7 @@ def update_iceflow_emulated(cfg, state):
     state.U = tf.where(state.thk > 0, U, 0)
     state.V = tf.where(state.thk > 0, V, 0)
 
-    # If requested, the speeds are artifically upper-bounded
+    # If requested, the speeds are artificially upper-bounded
     if cfg.processes.iceflow.force_max_velbar > 0:
         velbar_mag = getmag3d(state.U, state.V)
         state.U = \

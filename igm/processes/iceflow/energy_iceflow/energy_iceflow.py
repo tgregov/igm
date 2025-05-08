@@ -7,15 +7,15 @@ import numpy as np
 import tensorflow as tf 
 from igm.processes.utils import *
 
-from .utils import gauss_points_and_weigths, get_dz_COND
+from .utils  import gauss_points_and_weigths, get_dz_COND
 from ..utils import X_to_fieldin, Y_to_UV
 
 from .cost_gravity_2layers import cost_gravity_2layers
-from .cost_shear_2layers import cost_shear_2layers
+from .cost_shear_2layers   import cost_shear_2layers
 
-from .cost_shear import cost_shear
-from .cost_sliding import cost_sliding
-from .cost_gravity import cost_gravity
+from .cost_shear    import cost_shear
+from .cost_sliding  import cost_sliding
+from .cost_gravity  import cost_gravity
 from .cost_floating import cost_floating
 
 def iceflow_energy(cfg, U, V, fieldin):
@@ -24,12 +24,12 @@ def iceflow_energy(cfg, U, V, fieldin):
     # In that case, we assume the iceflow has a SIA-like profile
     if cfg.processes.iceflow.numerics.Nz == 2:
 
-        exp_glen = cfg.processes.iceflow.physics.exp_glen
-        exp_weertman = cfg.processes.iceflow.physics.exp_weertman
-        regu_glen = cfg.processes.iceflow.physics.regu_glen
-        regu_weertman = cfg.processes.iceflow.physics.regu_weertman
-        ice_density = cfg.processes.iceflow.physics.ice_density
-        gravity_cst = cfg.processes.iceflow.physics.gravity_cst
+        exp_glen           = cfg.processes.iceflow.physics.exp_glen
+        exp_weertman       = cfg.processes.iceflow.physics.exp_weertman
+        regu_glen          = cfg.processes.iceflow.physics.regu_glen
+        regu_weertman      = cfg.processes.iceflow.physics.regu_weertman
+        ice_density        = cfg.processes.iceflow.physics.ice_density
+        gravity_cst        = cfg.processes.iceflow.physics.gravity_cst
         new_friction_param = cfg.processes.iceflow.physics.new_friction_param
  
         n, w = gauss_points_and_weigths(ord_gauss=3)
@@ -48,21 +48,21 @@ def iceflow_energy(cfg, U, V, fieldin):
     # In that case, it can be SSA if Nz=1 or Blaater-Pattyn if Nz>2
     else:
 
-        Nz = cfg.processes.iceflow.numerics.Nz
-        vert_spacing = cfg.processes.iceflow.numerics.vert_spacing
-        exp_glen = cfg.processes.iceflow.physics.exp_glen
-        exp_weertman = cfg.processes.iceflow.physics.exp_weertman
-        regu_glen = cfg.processes.iceflow.physics.regu_glen
-        regu_weertman = cfg.processes.iceflow.physics.regu_weertman
-        thr_ice_thk = cfg.processes.iceflow.physics.thr_ice_thk
-        ice_density = cfg.processes.iceflow.physics.ice_density
-        gravity_cst = cfg.processes.iceflow.physics.gravity_cst
-        new_friction_param = cfg.processes.iceflow.physics.new_friction_param
-        cf_cond = cfg.processes.iceflow.physics.cf_cond
-        cf_eswn = cfg.processes.iceflow.physics.cf_eswn
-        regu = cfg.processes.iceflow.physics.regu
-        min_sr = cfg.processes.iceflow.physics.min_sr
-        max_sr = cfg.processes.iceflow.physics.max_sr
+        Nz                                  = cfg.processes.iceflow.numerics.Nz
+        vert_spacing                        = cfg.processes.iceflow.numerics.vert_spacing
+        exp_glen                            = cfg.processes.iceflow.physics.exp_glen
+        exp_weertman                        = cfg.processes.iceflow.physics.exp_weertman
+        regu_glen                           = cfg.processes.iceflow.physics.regu_glen
+        regu_weertman                       = cfg.processes.iceflow.physics.regu_weertman
+        thr_ice_thk                         = cfg.processes.iceflow.physics.thr_ice_thk
+        ice_density                         = cfg.processes.iceflow.physics.ice_density
+        gravity_cst                         = cfg.processes.iceflow.physics.gravity_cst
+        new_friction_param                  = cfg.processes.iceflow.physics.new_friction_param
+        cf_cond                             = cfg.processes.iceflow.physics.cf_cond
+        cf_eswn                             = cfg.processes.iceflow.physics.cf_eswn
+        regu                                = cfg.processes.iceflow.physics.regu
+        min_sr                              = cfg.processes.iceflow.physics.min_sr
+        max_sr                              = cfg.processes.iceflow.physics.max_sr
         force_negative_gravitational_energy = cfg.processes.iceflow.physics.force_negative_gravitational_energy
 
         dz, COND = get_dz_COND(thk, Nz, vert_spacing)
